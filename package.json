@@ -1,0 +1,16 @@
+{
+  "name": "online-rock-paper-scissors",
+  "version": "1.0.0",
+  "description": "A simple online rock paper scissors game",
+  "license": "ISC",
+  "author": "Mojtaba Alizadeh",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3"
+  }
+}
