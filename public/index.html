@@ -8,7 +8,12 @@
   <body>
     <ul id="messages"></ul>
     <form id="form" action="">
-      <input id="input" autocomplete="off" /><button>Send</button>
+      <select id="input">
+        <option value="rock">🏔</option>
+        <option value="paper">📄</option>
+        <option value="scissors">✂</option>
+      </select>
+      <button type="submit">send</button>
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -20,24 +25,23 @@
       form.addEventListener("submit", (e) => {
         e.preventDefault();
         if (input.value) {
-          socket.emit("message", input.value);
+          socket.emit("play", input.value);
           const item = document.createElement("li");
           item.textContent = input.value;
           item.classList.add("sender");
           messages.appendChild(item);
           window.scrollTo(0, document.body.scrollHeight);
-          input.value = "";
+          input.value = "rock";
         }
       });
 
-      socket.on("message", (msg) => {
-        console.log("hi");
-
-        const item = document.createElement("li");
+      socket.on("result", (msg) => {
+        alert(msg);
+        /* const item = document.createElement("li");
         item.textContent = msg;
         item.classList.add("receiver");
         messages.appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
+        window.scrollTo(0, document.body.scrollHeight); */
       });
     </script>
   </body>
