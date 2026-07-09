@@ -2,7 +2,7 @@ import { createRef } from "preact";
 import { socket } from "./lib/socket";
 import { toast } from "react-toastify";
 
-function Join({ onBack }) {
+function Join({ onBack, username }) {
   const ref = createRef();
 
   socket.on("error:room-full", (msg) => {
@@ -10,10 +10,6 @@ function Join({ onBack }) {
   });
 
   socket.on("error:no-room", (msg) => {
-    toast(msg);
-  });
-
-  socket.on("game:start", (msg) => {
     toast(msg);
   });
 
@@ -44,7 +40,9 @@ function Join({ onBack }) {
         <button
           id="join-room-btn"
           className="w-full py-4 rounded-2xl bg-violet-600 text-white text-2xl font-semibold shadow-lg hover:bg-violet-500 hover:scale-[1.02] active:scale-95 transition-all duration-200 cursor-pointer"
-          onClick={() => socket.emit("join", ref.current.value)}
+          onClick={() =>
+            socket.emit("join", { code: ref.current.value, username: username })
+          }
         >
           🚀 Join Room
         </button>

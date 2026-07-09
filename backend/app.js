@@ -2,7 +2,7 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const { createServer } = require("http");
-const { createClient } = require("redis");
+const { createClient, SocketClosedUnexpectedlyError } = require("redis");
 const { Server } = require("socket.io");
 
 const app = express();
@@ -65,40 +65,51 @@ io.on("connection", async (socket) => {
   console.log(`${socket.id} connected`);
 
   // When player clicks on hosting
-  socket.on("host", async () => {
-    const roomCode = generateRoomCode((length = 6));
-    socket.join(roomCode);
+  socket.on("host", async (username) => {
+    const code = generateRoomCode((length = 6));
+    socket.join(code);
+    socket.data.roomCode = code;
     await client.set(
-      `room:${roomCode}`,
+      `room:${code}`,
       JSON.stringify({
-        host: socket.id,
+        host: username,
         guest: null,
-        choice: {
+        choices: {
           host: null,
           guest: null,
         },
       }),
     );
-    io.to(roomCode).emit("sendCode", roomCode);
+    io.to(code).emit("sendCode", code);
   });
 
   // When player clicks on joining
-  socket.on("join", async (roomCode) => {
-    const room = JSON.parse(await client.get(`room:${roomCode}`));
+  socket.on("join", async ({ code, username }) => {
+    const room = JSON.parse(await client.get(`room:${code}`));
     if (!room) {
       return socket.emit("error:no-room", "Room doesn't exist");
     }
     if (room.guest) {
       return socket.emit("error:room-full", "Room already full");
     }
-    socket.join(roomCode);
-    room.guest = socket.id;
-    await client.set(`room:${roomCode}`, JSON.stringify(room));
-    io.to(roomCode).emit("game:start", "Game Started!");
+    socket.join(code);
+    room.guest = username;
+    await client.set(`room:${code}`, JSON.stringify(room));
+    io.to(code).emit("game:start", {
+      message: "Game Started!",
+      host: room.host,
+      guest: room.guest,
+    });
     console.log(room);
   });
 
-  socket.on("disconnect", () => {
+  socket.on("cancel", async () => {
+    await client.del(`room:${socket.data.roomCode}`);
+    console.log(`Room-${socket.data.roomCode} deleted`);
+  });
+
+  socket.on("disconnect", async () => {
+    await client.del(`room:${socket.data.roomCode}`);
     console.log(`${socket.id} disconnected`);
   });
 });
