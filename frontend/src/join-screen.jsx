@@ -1,8 +1,21 @@
 import { createRef } from "preact";
 import { socket } from "./lib/socket";
+import { toast } from "react-toastify";
 
 function Join({ onBack }) {
   const ref = createRef();
+
+  socket.on("error:room-full", (msg) => {
+    toast(msg);
+  });
+
+  socket.on("error:no-room", (msg) => {
+    toast(msg);
+  });
+
+  socket.on("game:start", (msg) => {
+    toast(msg);
+  });
 
   return (
     <div

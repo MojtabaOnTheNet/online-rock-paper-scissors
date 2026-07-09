@@ -1,14 +1,17 @@
 import { useEffect, useState } from "preact/hooks";
 import { socket } from "./lib/socket";
+import { toast } from "react-toastify";
 
 function Host({ onCancel }) {
   const [roomCode, setRoomCode] = useState("");
 
-  useEffect(() => {
-    socket.on("sendCode", (code) => {
-      setRoomCode(code);
-    });
-  }, []);
+  socket.on("sendCode", (code) => {
+    setRoomCode(code);
+  });
+
+  socket.on("game:start", (msg) => {
+    toast(msg);
+  });
 
   return (
     <div

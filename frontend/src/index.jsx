@@ -6,6 +6,7 @@ import Home from "./home-screen";
 import Host from "./host-screen";
 import Join from "./join-screen";
 import { socket } from "./lib/socket";
+import { ToastContainer } from "react-toastify";
 
 export function App() {
   const [screen, setScreen] = useState("home");
@@ -25,6 +26,7 @@ export function App() {
       {screen === "host" && <Host onCancel={() => setScreen("home")} />}
 
       {screen === "join" && <Join onBack={() => setScreen("home")} />}
+      <ToastContainer />
     </>
   );
 }

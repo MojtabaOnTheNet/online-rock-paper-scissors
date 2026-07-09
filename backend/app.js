@@ -54,8 +54,6 @@ function generateRoomCode(length = 6) {
   return code;
 }
 
-// app.use(express.static(path.join(__dirname, "public")));
-
 // Initialize redis
 (async () => {
   await client.connect();
@@ -87,8 +85,16 @@ io.on("connection", async (socket) => {
   // When player clicks on joining
   socket.on("join", async (roomCode) => {
     const room = JSON.parse(await client.get(`room:${roomCode}`));
+    if (!room) {
+      return socket.emit("error:no-room", "Room doesn't exist");
+    }
+    if (room.guest) {
+      return socket.emit("error:room-full", "Room already full");
+    }
+    socket.join(roomCode);
     room.guest = socket.id;
     await client.set(`room:${roomCode}`, JSON.stringify(room));
+    io.to(roomCode).emit("game:start", "Game Started!");
     console.log(room);
   });
 
