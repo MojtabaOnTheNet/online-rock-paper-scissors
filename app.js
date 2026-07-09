@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const { createServer } = require("http");
 const { createClient } = require("redis");
 const { Server } = require("socket.io");
@@ -27,7 +28,7 @@ function getWinner(player1, player2) {
   return player2;
 }
 
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 
 // Initialize redis
 (async () => {
