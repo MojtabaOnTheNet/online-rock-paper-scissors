@@ -7,7 +7,8 @@
   "type": "commonjs",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "dev": "nodemon app.js"
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.3.2",
@@ -15,5 +16,8 @@
     "redis": "^6.1.0",
     "socket.io": "^4.8.3",
     "tailwindcss": "^4.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
   }
 }

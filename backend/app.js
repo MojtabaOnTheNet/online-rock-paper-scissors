@@ -7,9 +7,12 @@ const { Server } = require("socket.io");
 
 const app = express();
 
+app.use(express.static(path.join(__dirname, "../public")));
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin:
+      process.env.NODE_ENV === "production" ? "*" : "http://localhost:5173",
     credentials: true,
   }),
 );
@@ -17,12 +20,16 @@ app.use(
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin:
+      process.env.NODE_ENV === "production" ? "*" : "http://localhost:5173",
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
-const client = createClient();
+
+const client = createClient({
+  url: process.env.REDIS_URL || "redis://redis:6379",
+});
 
 function getWinner(player1, player2) {
   // Draw
