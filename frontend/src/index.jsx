@@ -79,7 +79,7 @@ export function App() {
               onLeave={() => setScreen("home")}
             />
           )}
-          <ToastContainer limit={3} />
+          <ToastContainer limit={3} pauseOnFocusLoss={false} />
           <div className="absolute top-5 left-5 text-white">
             Username: {username}
             <span

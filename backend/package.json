@@ -5,10 +5,10 @@
   "license": "ISC",
   "author": "Mojtaba Alizadeh",
   "type": "commonjs",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
-    "start": "nodemon app.js",
-    "dev": "nodemon app.js"
+    "start": "nodemon server.js",
+    "dev": "nodemon server.js"
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.3.2",
