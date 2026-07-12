@@ -8,6 +8,7 @@ const {
   hostGame,
   cancelGame,
   disconnectUser,
+  playGame,
 } = require("./socket.controllers");
 
 const app = express();
@@ -47,6 +48,10 @@ io.on("connection", async (socket) => {
   // When player clicks on joining
   socket.on("join", async (gameData) => {
     await joinGame(io, socket, gameData);
+  });
+
+  socket.on("play", async (choice) => {
+    await playGame(io, socket, choice);
   });
 
   socket.on("cancel", async () => {

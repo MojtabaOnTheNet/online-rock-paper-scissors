@@ -27,3 +27,14 @@ exports.generateRoomCode = (length = 6) => {
 
   return code;
 };
+
+exports.resetPlayersStates = async (choice = false, points = false, room) => {
+  if (choice) {
+    if (points) {
+      room.host.points = 0;
+      room.guest.points = 0;
+    }
+    room.host.choice = null;
+    room.guest.choice = null;
+  }
+};

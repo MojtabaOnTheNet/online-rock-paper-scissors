@@ -1,18 +1,23 @@
 const client = require("./db");
-const { generateRoomCode, getWinner } = require("./utils");
+const { generateRoomCode, getWinner, resetPlayersStates } = require("./utils");
 
 exports.hostGame = async (io, socket, username) => {
   const code = generateRoomCode(6);
   socket.join(code);
   socket.data.roomCode = code;
+  socket.data.role = "host";
   await client.set(
     `room:${code}`,
     JSON.stringify({
-      host: username,
-      guest: null,
-      choices: {
-        host: null,
-        guest: null,
+      host: {
+        name: username,
+        choice: null,
+        points: 0,
+      },
+      guest: {
+        name: null,
+        choice: null,
+        points: 0,
       },
     }),
   );
@@ -24,18 +29,54 @@ exports.joinGame = async (io, socket, { code, username }) => {
   if (!room) {
     return socket.emit("error:no-room", "Room doesn't exist");
   }
-  if (room.guest) {
+  if (room.guest.name) {
     return socket.emit("error:room-full", "Room already full");
   }
   socket.join(code);
-  room.guest = username;
+  socket.data.roomCode = code;
+  socket.data.role = "guest";
+  room.guest.name = username;
   await client.set(`room:${code}`, JSON.stringify(room));
   io.to(code).emit("game:start", {
     message: "Game Started!",
-    host: room.host,
-    guest: room.guest,
+    room,
   });
   console.log(room);
+};
+
+exports.playGame = async (io, socket, choice) => {
+  // Get room code from socket data
+  const code = socket.data.roomCode;
+  let room = JSON.parse(await client.get(`room:${code}`));
+  let message = "";
+  if (socket.data.role === "host") {
+    room.host.choice = choice;
+  } else if (socket.data.role === "guest") {
+    room.guest.choice = choice;
+  }
+  if (room.host.choice && room.guest.choice) {
+    const winner = getWinner(room.host, room.guest);
+    if (winner !== "draw") {
+      winner.points += 1;
+      if (winner.points === 5) {
+        resetPlayersStates(true, true, room);
+        message = `${winner.name} won the entire game!`;
+      } else {
+        resetPlayersStates(true, false, room);
+        message = `${winner.name} won! next round starts...`;
+      }
+    } else {
+      resetPlayersStates(true, false, room);
+      message = `The game was a draw! next round starts...`;
+    }
+    await client.set(`room:${code}`, JSON.stringify(room));
+    io.to(code).emit("game:next-round", {
+      message,
+      room,
+    });
+  } else {
+    await client.set(`room:${code}`, JSON.stringify(room));
+  }
 };
 
 exports.cancelGame = async (socket) => {

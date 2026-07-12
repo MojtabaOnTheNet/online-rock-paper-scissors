@@ -14,26 +14,38 @@ export function App() {
   const [screen, setScreen] = useState("home");
 
   const [username, setUsername] = useState(localStorage.getItem("username"));
+  const [isHost, setIsHost] = useState(false);
   const [gameData, setGameData] = useState({
-    host: "",
-    guest: "",
+    host: {
+      name: "",
+      choice: "",
+      points: 0,
+    },
+    guest: {
+      name: "",
+      choice: "",
+      points: 0,
+    },
   });
 
   useEffect(() => {
     function handleGameStart(data) {
       toast(data.message);
-      setGameData({
-        ...gameData,
-        host: data.host,
-        guest: data.guest,
-      });
+      setGameData(data.room);
       setScreen("game");
+      setIsHost(username === data.host.name);
+    }
+    function handleGameNextRound(data) {
+      toast(data.message);
+      setGameData(data.room);
     }
 
     socket.on("game:start", handleGameStart);
+    socket.on("game:next-round", handleGameNextRound);
 
     return () => {
       socket.off("game:start", handleGameStart);
+      socket.off("game:next-round", handleGameNextRound);
     };
   }, []);
 
@@ -66,17 +78,18 @@ export function App() {
 
           {screen === "game" && (
             <Game
-              playerName={
-                username === gameData.host ? gameData.host : gameData.guest
+              playerName={isHost ? gameData.host.name : gameData.guest.name}
+              opponentName={isHost ? gameData.guest.name : gameData.host.name}
+              score={isHost ? gameData.host.points : gameData.guest.points}
+              opponentScore={
+                isHost ? gameData.guest.points : gameData.host.points
               }
-              opponentName={
-                username === gameData.host ? gameData.guest : gameData.host
-              }
-              score={2}
-              opponentScore={1}
               roundText="Choose your move"
               onChoice={(choice) => socket.emit("play", choice)}
-              onLeave={() => setScreen("home")}
+              onLeave={() => {
+                socket.emit("cancel");
+                setScreen("home");
+              }}
             />
           )}
           <ToastContainer limit={3} pauseOnFocusLoss={false} />
