@@ -1,6 +1,12 @@
 const { createClient } = require("redis");
 
-const client = createClient();
+const inDocker = false;
+
+const client = createClient(
+  inDocker && {
+    url: process.env.REDIS_URL || "redis://redis:6379",
+  },
+);
 
 // Initialize redis
 (async () => {
