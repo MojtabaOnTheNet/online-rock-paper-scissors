@@ -33,7 +33,7 @@ function Host({ onCancel }) {
           className="px-10 py-4 rounded-xl bg-indigo-600 text-white text-xl font-semibold shadow-lg hover:bg-indigo-500 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
           onClick={() => {
             navigator.clipboard.writeText(roomCode);
-            toast("Code copied", {
+            toast.info("Code copied", {
               toastId: "copyToast",
             });
           }}

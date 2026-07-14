@@ -6,11 +6,11 @@ function Join({ onBack, username }) {
   const ref = createRef();
 
   socket.on("error:room-full", (msg) => {
-    toast(msg);
+    toast.warn(msg);
   });
 
   socket.on("error:no-room", (msg) => {
-    toast(msg);
+    toast.warn(msg);
   });
 
   return (

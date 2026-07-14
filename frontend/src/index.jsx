@@ -1,7 +1,7 @@
 import { render } from "preact";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import "./style.css";
-
+import { Slide, Zoom, Flip, Bounce } from "react-toastify";
 import Home from "./home-screen";
 import Host from "./host-screen";
 import Join from "./join-screen";
@@ -12,8 +12,8 @@ import Game from "./game-screen";
 import Background from "./background";
 
 export function App() {
+  const resultToast = useRef(null);
   const [screen, setScreen] = useState("home");
-
   const [username, setUsername] = useState(localStorage.getItem("username"));
   const [isHost, setIsHost] = useState(false);
   const [tempChoices, setTempChoices] = useState({
@@ -36,16 +36,23 @@ export function App() {
 
   useEffect(() => {
     function handleGameStart(data) {
-      toast(data.message);
+      toast.success(data.message);
       setGameData(data.room);
       setScreen("game");
-
       setIsHost(username === data.room.host.name);
     }
     function handleGameNextRound(data) {
-      console.log(data);
+      toast.update(resultToast.current, {
+        render: "Answers submitted...",
+        type: "info",
+        autoClose: false,
+      });
       setTimeout(() => {
-        toast(data.message);
+        toast.update(resultToast.current, {
+          render: data.message,
+          type: "success",
+          autoClose: 3000,
+        });
         setTempChoices(data.tempChoices);
         setTimeout(() => {
           setTempChoices({
@@ -54,12 +61,12 @@ export function App() {
           });
           setGameData(data.room);
           setNextRound((prev) => prev + 1);
-        }, 2000);
-      }, 3000);
+        }, 3000);
+      }, 2000);
     }
     function handleCancelGame(data) {
       setScreen("home");
-      toast(data.message);
+      toast.error(data.message);
       setGameData({
         host: {
           name: "",
@@ -127,7 +134,15 @@ export function App() {
                   isHost ? gameData.guest.points : gameData.host.points
                 }
                 roundText="Choose your move"
-                onChoice={(choice) => socket.emit("play", choice)}
+                onChoice={(choice) => {
+                  socket.emit("play", choice);
+                  resultToast.current = toast.info(
+                    "Waiting for other player...",
+                    {
+                      autoClose: false,
+                    },
+                  );
+                }}
                 onLeave={() => {
                   socket.emit("cancel");
                   setScreen("home");
@@ -136,7 +151,18 @@ export function App() {
                 tempChoices={isHost ? tempChoices.guest : tempChoices.host}
               />
             )}
-            <ToastContainer limit={3} pauseOnFocusLoss={false} />
+            <ToastContainer
+              limit={1}
+              pauseOnFocusLoss={false}
+              pauseOnHover={false}
+              position="top-center"
+              theme="dark"
+              autoClose={1000}
+              hideProgressBar
+              newestOnTop
+              transition={Zoom}
+              closeButton={false}
+            />
             <div className="absolute top-5 left-5 text-white">
               Username: {username}
               {screen === "game" ? null : (
