@@ -55,11 +55,11 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("cancel", async () => {
-    await cancelGame(socket);
+    await cancelGame(io, socket);
   });
 
   socket.on("disconnect", async () => {
-    await disconnectUser(socket);
+    await disconnectUser(io, socket);
   });
 });
 

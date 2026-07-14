@@ -16,6 +16,11 @@ export function App() {
 
   const [username, setUsername] = useState(localStorage.getItem("username"));
   const [isHost, setIsHost] = useState(false);
+  const [tempChoices, setTempChoices] = useState({
+    host: "",
+    guest: "",
+  });
+  const [nextRound, setNextRound] = useState(0);
   const [gameData, setGameData] = useState({
     host: {
       name: "",
@@ -34,20 +39,54 @@ export function App() {
       toast(data.message);
       setGameData(data.room);
       setScreen("game");
-      console.log(data);
+
       setIsHost(username === data.room.host.name);
     }
     function handleGameNextRound(data) {
+      console.log(data);
+      setTimeout(() => {
+        toast(data.message);
+        setTempChoices(data.tempChoices);
+        setTimeout(() => {
+          setTempChoices({
+            host: "",
+            guest: "",
+          });
+          setGameData(data.room);
+          setNextRound((prev) => prev + 1);
+        }, 2000);
+      }, 3000);
+    }
+    function handleCancelGame(data) {
+      setScreen("home");
       toast(data.message);
-      setGameData(data.room);
+      setGameData({
+        host: {
+          name: "",
+          choice: "",
+          points: 0,
+        },
+        guest: {
+          name: "",
+          choice: "",
+          points: 0,
+        },
+      });
+      setTempChoices({
+        host: "",
+        guest: "",
+      });
+      setNextRound(0);
     }
 
     socket.on("game:start", handleGameStart);
     socket.on("game:next-round", handleGameNextRound);
+    socket.on("game:cancel", handleCancelGame);
 
     return () => {
       socket.off("game:start", handleGameStart);
       socket.off("game:next-round", handleGameNextRound);
+      socket.off("game:cancel", handleCancelGame);
     };
   }, []);
 
@@ -93,19 +132,23 @@ export function App() {
                   socket.emit("cancel");
                   setScreen("home");
                 }}
+                nextRound={nextRound}
+                tempChoices={isHost ? tempChoices.guest : tempChoices.host}
               />
             )}
             <ToastContainer limit={3} pauseOnFocusLoss={false} />
             <div className="absolute top-5 left-5 text-white">
               Username: {username}
-              <span
-                className="underline text-blue-300 pl-3 cursor-pointer"
-                onClick={() => {
-                  setUsername("");
-                }}
-              >
-                change
-              </span>
+              {screen === "game" ? null : (
+                <span
+                  className="underline text-blue-300 pl-3 cursor-pointer"
+                  onClick={() => {
+                    setUsername("");
+                  }}
+                >
+                  change
+                </span>
+              )}
             </div>
           </>
         ) : (

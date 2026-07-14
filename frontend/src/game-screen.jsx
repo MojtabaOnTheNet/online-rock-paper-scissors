@@ -9,8 +9,11 @@ function Game({
   roundText,
   onChoice,
   onLeave,
+  nextRound,
+  tempChoices,
 }) {
   const [choice, setChoice] = useState("");
+  const [submitted, setSubmitted] = useState(false);
   const leftHandRef = useRef();
   const rightHandRef = useRef();
   const idleTween = useRef(null);
@@ -36,6 +39,11 @@ function Game({
       onComplete: onLeave, // unmount after animation
     });
   };
+
+  useEffect(() => {
+    setChoice("");
+    setSubmitted(false);
+  }, [nextRound]);
 
   useEffect(() => {
     gsap.fromTo(
@@ -143,21 +151,24 @@ function Game({
         <div className="flex justify-center gap-8">
           <button
             onClick={() => setChoice("rock")}
-            className={`w-44 h-44 rounded-3xl bg-slate-900 border-2  hover:border-emerald-400 hover:scale-105 transition-all text-7xl cursor-pointer ${choice === "rock" ? "border-emerald-400" : "border-slate-700"}`}
+            className={`w-44 h-44 rounded-3xl bg-slate-900 border-2  hover:border-emerald-400 hover:scale-105 transition-all text-7xl cursor-pointer ${choice === "rock" ? "border-emerald-400 disabled:hover:border-emerald-400" : "border-slate-700 disabled:opacity-40 disabled:hover:border-slate-700"} disabled:cursor-default  disabled:hover:scale-100`}
+            disabled={submitted}
           >
             ✊
           </button>
 
           <button
             onClick={() => setChoice("paper")}
-            className={`w-44 h-44 rounded-3xl bg-slate-900 border-2  hover:border-violet-400 hover:scale-105 transition-all text-7xl cursor-pointer ${choice === "paper" ? "border-violet-400" : "border-slate-700"}`}
+            className={`w-44 h-44 rounded-3xl bg-slate-900 border-2  hover:border-violet-400 hover:scale-105 transition-all text-7xl cursor-pointer ${choice === "paper" ? "border-violet-400 disabled:hover:border-violet-400" : "border-slate-700 disabled:opacity-40 disabled:hover:border-slate-700"} disabled:cursor-default disabled:hover:scale-100`}
+            disabled={submitted}
           >
             ✋
           </button>
 
           <button
             onClick={() => setChoice("scissors")}
-            className={`w-44 h-44 rounded-3xl bg-slate-900 border-2  hover:border-amber-400 hover:scale-105 transition-all text-7xl cursor-pointer ${choice === "scissors" ? "border-amber-400" : "border-slate-700"}`}
+            className={`w-44 h-44 rounded-3xl bg-slate-900 border-2  hover:border-amber-400 hover:scale-105 transition-all text-7xl cursor-pointer ${choice === "scissors" ? "border-amber-400 disabled:hover:border-amber-400" : "border-slate-700 disabled:opacity-40 disabled:hover:border-slate-700"} disabled:cursor-default  disabled:hover:scale-100`}
+            disabled={submitted}
           >
             ✌️
           </button>
@@ -171,7 +182,10 @@ function Game({
           </div>
 
           <button
-            onClick={() => onChoice(choice)}
+            onClick={() => {
+              onChoice(choice);
+              setSubmitted(true);
+            }}
             className="px-6 py-3 rounded-xl disabled:cursor-default disabled:bg-gray-500 bg-green-500 text-white font-semibold hover:bg-red-400 transition cursor-pointer"
             disabled={choice === ""}
           >
@@ -194,7 +208,7 @@ function Game({
       />
       <img
         ref={rightHandRef}
-        src="rpcDefault.png"
+        src={images[tempChoices] || "rpcDefault.png"}
         alt=""
         className="absolute top-70 right-0 rotate-y-180 w-150"
       />

@@ -48,6 +48,7 @@ exports.playGame = async (io, socket, choice) => {
   // Get room code from socket data
   const code = socket.data.roomCode;
   let room = JSON.parse(await client.get(`room:${code}`));
+  let tempChoices = {};
   let message = "";
   if (socket.data.role === "host") {
     room.host.choice = choice;
@@ -56,6 +57,10 @@ exports.playGame = async (io, socket, choice) => {
   }
   if (room.host.choice && room.guest.choice) {
     const winner = getWinner(room.host, room.guest);
+    tempChoices = {
+      host: room.host.choice,
+      guest: room.guest.choice,
+    };
     if (winner !== "draw") {
       winner.points += 1;
       if (winner.points === 5) {
@@ -73,20 +78,29 @@ exports.playGame = async (io, socket, choice) => {
     io.to(code).emit("game:next-round", {
       message,
       room,
+      tempChoices,
     });
   } else {
     await client.set(`room:${code}`, JSON.stringify(room));
   }
 };
 
-exports.cancelGame = async (socket) => {
+exports.cancelGame = async (io, socket) => {
   await client.del(`room:${socket.data.roomCode}`);
+  io.to(socket.data.roomCode).emit("game:cancel", {
+    message: "Game canceled!",
+  });
+  socket.leave(socket.data.roomCode);
   console.log(`Room-${socket.data.roomCode} deleted`);
 };
 
-exports.disconnectUser = async (socket) => {
+exports.disconnectUser = async (io, socket) => {
   if (socket.data.roomCode) {
     await client.del(`room:${socket.data.roomCode}`);
+    io.to(socket.data.roomCode).emit("game:cancel", {
+      message: "Game canceled!",
+    });
+    socket.leave(socket.data.roomCode);
   }
   console.log(`${socket.id} disconnected`);
 };
