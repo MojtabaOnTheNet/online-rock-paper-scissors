@@ -1,3 +1,6 @@
+# Demo
+![Online Rock Paper Scissors](./demo.png)
+
 # Online Rock Paper Scissors
 
 A simple real-time **Rock Paper Scissors** game built to learn how WebSockets work in production applications. The project focuses on building a multiplayer game from scratch using **Socket.IO**, **Redis**, and **Node.js** without relying on frontend frameworks or SSR frameworks like Next.js.
