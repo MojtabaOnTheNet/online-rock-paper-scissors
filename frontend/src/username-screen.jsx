@@ -6,11 +6,11 @@ function Username({ onContinue }) {
   const ref = createRef();
 
   return (
-    <div className="w-175 rounded-3xl bg-slate-800/70 backdrop-blur-xl border border-slate-700 shadow-2xl p-12 flex flex-col items-center gap-8">
+    <div className="w-100 md:w-175 rounded-3xl bg-slate-800/70 backdrop-blur-xl border border-slate-700 shadow-2xl p-12 flex flex-col items-center gap-8">
       <div className="text-center space-y-3">
-        <h1 className="text-5xl font-bold text-white">Welcome!</h1>
+        <h1 className="text-2xl md:text-5xl font-bold text-white">Welcome!</h1>
 
-        <p className="text-slate-300 text-lg">
+        <p className="text-slate-300 text-md md:text-lg">
           Choose a username before you start playing.
         </p>
       </div>
@@ -25,7 +25,7 @@ function Username({ onContinue }) {
         autoComplete="off"
         spellcheck={false}
         placeholder="Enter your username..."
-        className="w-full rounded-2xl bg-slate-900 border-2 border-slate-600 px-6 py-5 text-center text-2xl font-semibold text-white placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none transition"
+        className="w-full rounded-2xl bg-slate-900 border-2 border-slate-600 px-3 py-3 md:px-6 md:py-5 text-center text-lg md:text-2xl font-semibold text-white placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none transition"
       />
 
       <button
@@ -34,13 +34,13 @@ function Username({ onContinue }) {
 
           onContinue(username);
         }}
-        className="w-full rounded-2xl bg-indigo-600 py-4 text-2xl font-semibold text-white shadow-lg transition-all duration-200 hover:bg-indigo-500 hover:scale-[1.02] active:scale-95 cursor-pointer"
+        className="w-full rounded-2xl bg-indigo-600 py-2 md:py-4 text-lg md:text-2xl font-semibold text-white shadow-lg transition-all duration-200 hover:bg-indigo-500 hover:scale-[1.02] active:scale-95 cursor-pointer"
         disabled={username.trim() === ""}
       >
         Continue
       </button>
 
-      <p className="text-sm text-slate-400">
+      <p className="text-sm text-center text-slate-400">
         Your username will be shown to your opponent.
       </p>
     </div>

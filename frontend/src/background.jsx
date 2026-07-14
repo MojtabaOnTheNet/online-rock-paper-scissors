@@ -36,7 +36,7 @@ function Background() {
           id="fg"
           src="layer2.png"
           alt=""
-          className="absolute scale-[100%] inset-0 w-full h-full object-cover"
+          className="hidden xl:block absolute scale-[100%] inset-0 w-full h-full object-cover"
         />
       </div>
     </>

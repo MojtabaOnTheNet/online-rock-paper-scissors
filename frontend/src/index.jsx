@@ -99,7 +99,6 @@ export function App() {
         guest: "",
       });
       setNextRound(0);
-      socket.emit("cancel");
     }
 
     socket.on("game:start", handleGameStart);

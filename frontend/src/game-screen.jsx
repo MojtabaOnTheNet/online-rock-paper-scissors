@@ -122,25 +122,33 @@ function Game({
 
   return (
     <>
-      <div className="w-225 rounded-3xl bg-slate-800/70 backdrop-blur-xl border border-slate-700 shadow-2xl p-10 flex flex-col gap-10">
+      <div className="w-100 md:w-225 rounded-3xl bg-slate-800/70 backdrop-blur-xl border border-slate-700 shadow-2xl p-10 flex flex-col gap-10">
         {/* Top */}
         <div className="flex justify-between items-center">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-white">{playerName}</h2>
+            <h2 className="text-md md:text-2xl font-bold text-white">
+              {playerName}
+            </h2>
 
-            <p className="text-5xl font-black text-emerald-400 mt-2">{score}</p>
+            <p className="text-4xl md:text-5xl font-black text-emerald-400 mt-2">
+              {score}
+            </p>
           </div>
 
           <div className="text-center">
-            <h1 className="text-4xl font-black text-white">VS</h1>
+            <h1 className="text-2xl md:text-4xl font-black text-white">VS</h1>
 
-            <p className="mt-3 text-slate-300">{roundText}</p>
+            <p className="mt-3 text-sm md:text-md text-slate-300">
+              {roundText}
+            </p>
           </div>
 
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-white">{opponentName}</h2>
+            <h2 className="text-md md:text-2xl font-bold text-white">
+              {opponentName}
+            </h2>
 
-            <p className="text-5xl font-black text-violet-400 mt-2">
+            <p className="text-4xl md:text-5xl font-black text-violet-400 mt-2">
               {opponentScore}
             </p>
           </div>
@@ -151,7 +159,7 @@ function Game({
         <div className="flex justify-center gap-8">
           <button
             onClick={() => setChoice("rock")}
-            className={`w-44 h-44 rounded-3xl bg-slate-900 border-2  hover:border-emerald-400 hover:scale-105 transition-all text-7xl cursor-pointer ${choice === "rock" ? "border-emerald-400 disabled:hover:border-emerald-400" : "border-slate-700 disabled:opacity-40 disabled:hover:border-slate-700"} disabled:cursor-default  disabled:hover:scale-100`}
+            className={`w-22 md:w-44 h-22 md:h-44 rounded-3xl bg-slate-900 border-2  hover:border-emerald-400 hover:scale-105 transition-all text-5xl md:text-7xl cursor-pointer ${choice === "rock" ? "border-emerald-400 disabled:hover:border-emerald-400" : "border-slate-700 disabled:opacity-40 disabled:hover:border-slate-700"} disabled:cursor-default  disabled:hover:scale-100`}
             disabled={submitted}
           >
             ✊
@@ -159,7 +167,7 @@ function Game({
 
           <button
             onClick={() => setChoice("paper")}
-            className={`w-44 h-44 rounded-3xl bg-slate-900 border-2  hover:border-violet-400 hover:scale-105 transition-all text-7xl cursor-pointer ${choice === "paper" ? "border-violet-400 disabled:hover:border-violet-400" : "border-slate-700 disabled:opacity-40 disabled:hover:border-slate-700"} disabled:cursor-default disabled:hover:scale-100`}
+            className={`w-22 md:w-44 h-22 md:h-44 rounded-3xl bg-slate-900 border-2  hover:border-violet-400 hover:scale-105 transition-all text-5xl md:text-7xl cursor-pointer ${choice === "paper" ? "border-violet-400 disabled:hover:border-violet-400" : "border-slate-700 disabled:opacity-40 disabled:hover:border-slate-700"} disabled:cursor-default disabled:hover:scale-100`}
             disabled={submitted}
           >
             ✋
@@ -167,7 +175,7 @@ function Game({
 
           <button
             onClick={() => setChoice("scissors")}
-            className={`w-44 h-44 rounded-3xl bg-slate-900 border-2  hover:border-amber-400 hover:scale-105 transition-all text-7xl cursor-pointer ${choice === "scissors" ? "border-amber-400 disabled:hover:border-amber-400" : "border-slate-700 disabled:opacity-40 disabled:hover:border-slate-700"} disabled:cursor-default  disabled:hover:scale-100`}
+            className={`w-22 md:w-44 h-22 md:h-44 rounded-3xl bg-slate-900 border-2  hover:border-amber-400 hover:scale-105 transition-all text-5xl md:text-7xl cursor-pointer ${choice === "scissors" ? "border-amber-400 disabled:hover:border-amber-400" : "border-slate-700 disabled:opacity-40 disabled:hover:border-slate-700"} disabled:cursor-default  disabled:hover:scale-100`}
             disabled={submitted}
           >
             ✌️
@@ -176,8 +184,8 @@ function Game({
 
         {/* Bottom */}
 
-        <div className="flex justify-between items-center">
-          <div className="text-slate-300 text-lg">
+        <div className="flex justify-between items-center md:flex-row flex-col md:gap-0 gap-7">
+          <div className="text-slate-300 text-xl md:text-lg">
             First to <span className="font-bold text-white">5</span> wins
           </div>
 
@@ -204,13 +212,13 @@ function Game({
         ref={leftHandRef}
         src={images[choice] || "rpcDefault.png"}
         alt=""
-        className="absolute top-70 left-0 w-150"
+        className="hidden xl:block absolute top-70 left-0 w-150 pointer-events-none"
       />
       <img
         ref={rightHandRef}
         src={images[tempChoices] || "rpcDefault.png"}
         alt=""
-        className="absolute top-70 right-0 rotate-y-180 w-150"
+        className="hidden xl:block absolute top-70 right-0 rotate-y-180 w-150 pointer-events-none"
       />
     </>
   );
