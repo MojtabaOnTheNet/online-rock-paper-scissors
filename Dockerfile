@@ -10,7 +10,7 @@ RUN npm run build
 FROM node:20-alpine
 WORKDIR /app/backend
 COPY backend/package*.json ./
-RUN npm ci
+RUN npm ci --omit=dev
 COPY backend/ ./
 
 # Copy built frontend from builder stage
@@ -20,4 +20,4 @@ COPY --from=frontend-builder /app/frontend/dist /app/public
 EXPOSE 8000
 
 # Start backend
-CMD ["npm", "start"]
+CMD ["node", "server.js"]

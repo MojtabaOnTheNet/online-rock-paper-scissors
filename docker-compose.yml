@@ -8,15 +8,13 @@ services:
       - NODE_ENV=production
     depends_on:
       - redis
-    volumes:
-      - ./backend:/app/backend
-      - /app/backend/node_modules
-    develop:
-      watch:
-        - path: ./backend
-          action: rebuild
+    restart: unless-stopped
 
   redis:
     image: redis:8
-    ports:
-      - "6379:6379"
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:
