@@ -2,46 +2,65 @@ const client = require("./db");
 const { generateRoomCode, getWinner, resetPlayersStates } = require("./utils");
 
 exports.hostGame = async (io, socket, username) => {
-  const code = generateRoomCode(6);
-  socket.join(code);
-  socket.data.roomCode = code;
-  socket.data.role = "host";
-  await client.set(
-    `room:${code}`,
-    JSON.stringify({
-      host: {
-        name: username,
-        choice: null,
-        points: 0,
-      },
-      guest: {
-        name: null,
-        choice: null,
-        points: 0,
-      },
-    }),
-  );
-  io.to(code).emit("sendCode", code);
+  console.log(`[hostGame] "host" event received from socket ${socket.id} with username: ${username}`);
+  try {
+    const code = generateRoomCode(6);
+    console.log(`[hostGame] generated room code: ${code}`);
+    socket.join(code);
+    socket.data.roomCode = code;
+    socket.data.role = "host";
+    await client.set(
+      `room:${code}`,
+      JSON.stringify({
+        host: {
+          name: username,
+          choice: null,
+          points: 0,
+        },
+        guest: {
+          name: null,
+          choice: null,
+          points: 0,
+        },
+      }),
+    );
+    console.log(`[hostGame] room:${code} persisted to Redis, socket.data.roomCode set to ${socket.data.roomCode}`);
+    io.to(code).emit("sendCode", code);
+  } catch (err) {
+    console.error(`[hostGame] error while hosting game for socket ${socket.id}:`, err);
+    socket.emit("error:redis", "Failed to create room, please try again");
+  }
 };
 
 exports.joinGame = async (io, socket, { code, username }) => {
-  const room = JSON.parse(await client.get(`room:${code}`));
-  if (!room) {
-    return socket.emit("error:no-room", "Room doesn't exist");
+  console.log(`[joinGame] "join" event received from socket ${socket.id} - requested code: ${code}, username: ${username}`);
+  try {
+    const raw = await client.get(`room:${code}`);
+    console.log(`[joinGame] Redis returned for room:${code}:`, raw);
+    const room = JSON.parse(raw);
+    if (!room) {
+      console.log(`[joinGame] room:${code} not found in Redis`);
+      return socket.emit("error:no-room", "Room doesn't exist");
+    }
+    if (room.guest.name) {
+      console.log(`[joinGame] room:${code} is already full`);
+      return socket.emit("error:room-full", "Room already full");
+    }
+    socket.join(code);
+    socket.data.roomCode = code;
+    socket.data.role = "guest";
+    room.guest.name = username;
+    await client.set(`room:${code}`, JSON.stringify(room));
+    console.log(`[joinGame] room:${code} updated in Redis, socket.data.roomCode set to ${socket.data.roomCode}`);
+    io.to(code).emit("game:start", {
+      message: "Game Started!",
+      room,
+    });
+    console.log(room);
+  } catch (err) {
+    console.error(`[joinGame] error while joining room ${code} for socket ${socket.id}:`, err);
+    socket.emit("error:redis", "Failed to join room, please try again");
   }
-  if (room.guest.name) {
-    return socket.emit("error:room-full", "Room already full");
-  }
-  socket.join(code);
-  socket.data.roomCode = code;
-  socket.data.role = "guest";
-  room.guest.name = username;
-  await client.set(`room:${code}`, JSON.stringify(room));
-  io.to(code).emit("game:start", {
-    message: "Game Started!",
-    room,
-  });
-  console.log(room);
 };
 
 exports.playGame = async (io, socket, choice) => {
