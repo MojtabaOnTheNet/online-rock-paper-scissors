@@ -59,6 +59,21 @@ export function App() {
             host: "",
             guest: "",
           });
+          if (data.room.host.points === 5) {
+            toast.update(resultToast.current, {
+              render: `${data.room.host.name} wins! 🏆`,
+              type: "success",
+              autoClose: 3000,
+            });
+            return handleCancelGame(data);
+          } else if (data.room.guest.points === 5) {
+            toast.update(resultToast.current, {
+              render: `${data.room.guest.name} wins! 🏆`,
+              type: "success",
+              autoClose: 3000,
+            });
+            return handleCancelGame(data);
+          }
           setGameData(data.room);
           setNextRound((prev) => prev + 1);
         }, 3000);
@@ -84,6 +99,7 @@ export function App() {
         guest: "",
       });
       setNextRound(0);
+      socket.emit("cancel");
     }
 
     socket.on("game:start", handleGameStart);
