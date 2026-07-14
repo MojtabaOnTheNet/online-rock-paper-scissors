@@ -5,9 +5,17 @@ import { toast } from "react-toastify";
 function Host({ onCancel }) {
   const [roomCode, setRoomCode] = useState("");
 
-  socket.on("sendCode", (code) => {
-    setRoomCode(code);
-  });
+  useEffect(() => {
+    function handleSendCode(code) {
+      setRoomCode(code);
+    }
+
+    socket.on("sendCode", handleSendCode);
+
+    return () => {
+      socket.off("sendCode", handleSendCode);
+    };
+  }, []);
 
   return (
     <div
