@@ -25,7 +25,9 @@ exports.hostGame = async (io, socket, username) => {
 };
 
 exports.joinGame = async (io, socket, { code, username }) => {
-  const room = JSON.parse(await client.get(`room:${code}`));
+  const room = JSON.parse(
+    await client.get(`room:${code.trim().toUpperCase()}`),
+  );
   if (!room) {
     return socket.emit("error:no-room", "Room doesn't exist");
   }
