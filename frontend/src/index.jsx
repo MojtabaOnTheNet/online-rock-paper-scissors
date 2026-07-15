@@ -81,6 +81,7 @@ export function App() {
     }
     function handleCancelGame(data) {
       setScreen("home");
+      toast.dismiss();
       toast.error(data.message);
       setGameData({
         host: {
