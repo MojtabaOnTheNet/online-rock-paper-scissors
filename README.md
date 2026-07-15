@@ -25,8 +25,56 @@ A simple real-time **Rock Paper Scissors** game built to learn how WebSockets wo
 | Node.js             | Backend server and server-side rendering         |
 | Socket.IO           | Real-time bidirectional communication            |
 | Redis               | Game room storage, session data, and matchmaking |
-| HTML/CSS/JavaScript | Client-side interface                            |
+| Vite + Preact       | Client-side interface                            |
 | Express             | HTTP server and routing                          |
+
+---
+
+## Running with Docker
+
+### Prerequisites
+
+- Docker
+- Docker Compose
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/MojtabaOnTheNet/online-rock-paper-scissors.git
+cd online-rock-paper-scissors
+```
+
+### 2. Build the Docker image
+
+```bash
+docker build -t online-rock-paper-scissors .
+```
+
+### 3. Start the application
+
+```bash
+docker compose up
+```
+
+Or, to run it in the background:
+
+```bash
+docker compose up -d
+```
+
+### 4. Open the application
+
+Visit:
+
+```
+http://localhost:PORT
+```
+
+### 5. Stop the application
+
+```bash
+docker compose down
+```
 
 ---
 
@@ -53,7 +101,7 @@ A simple real-time **Rock Paper Scissors** game built to learn how WebSockets wo
 
 ### Redis Integration
 
-Redis will be used as temporary storage for:
+Redis is used as temporary storage for:
 
 - Active game rooms
 - Room codes
@@ -66,19 +114,15 @@ Example room structure:
 
 ```json
 {
-  "code": "ABCD12",
-  "players": [
-    {
-      "id": "socket-id-1",
-      "name": "Alice"
-    },
-    {
-      "id": "socket-id-2",
-      "name": "Bob"
-    }
-  ],
-  "status": "playing",
-  "round": 3
+  host: {
+    name: "John",
+    choice: "Rock",
+    points: 2
+  }, {
+    name: "Doe",
+    choice: "Paper",
+    points: 3
+  }
 }
 ```
 
@@ -86,30 +130,13 @@ Example room structure:
 
 ### Server-Side Rendering
 
-Instead of using a framework like Next.js, pages will be rendered directly by Node.js.
+Instead of using a framework like Next.js, pages will be rendered directly by Node.js, using the build option on Vite.
 
 Benefits:
 
 - Learn how SSR works internally.
 - Full control over HTML generation.
-- No frontend framework required.
 - Faster understanding of the request-response lifecycle.
-
-Example flow:
-
-```
-Browser
-    │
-HTTP Request
-    │
-Node.js
-    │
-Generate HTML
-    │
-Return HTML
-    │
-Browser renders page
-```
 
 Static assets such as CSS, JavaScript, and images will be served by Express.
 
@@ -117,53 +144,39 @@ Static assets such as CSS, JavaScript, and images will be served by Express.
 
 ## WebSocket Events
 
-### Client → Server
-
 | Event          | Description                     |
 | -------------- | ------------------------------- |
 | `create-room`  | Create a new game room          |
 | `join-room`    | Join an existing room           |
-| `player-ready` | Player is ready                 |
-| `play-move`    | Send Rock/Paper/Scissors choice |
-| `play-again`   | Start another round             |
-
----
-
-### Server → Client
-
-| Event           | Description               |
-| --------------- | ------------------------- |
-| `room-created`  | Room successfully created |
-| `room-joined`   | Successfully joined room  |
-| `player-joined` | Opponent connected        |
-| `round-start`   | Begin a new round         |
-| `round-result`  | Winner and choices        |
-| `player-left`   | Opponent disconnected     |
-| `game-ended`    | Game finished             |
+| `play`         | Submit answer                   |
+And more...
 
 ---
 
 ## Project Structure
 
 ```
-project/
-│
-├── server/
-│   ├── index.js
-│   ├── routes/
-│   ├── sockets/
-│   ├── services/
-│   ├── redis/
-│   ├── views/
-│   └── utils/
-│
-├── public/
-│   ├── css/
-│   ├── js/
-│   └── images/
-│
-├── package.json
-└── README.md
+├── Dockerfile
+├── README.md
+├── backend
+│   ├── db.js
+│   ├── node_modules
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── server.js
+│   ├── socket.controllers.js
+│   └── utils.js
+├── demo.png
+├── docker-compose.yml
+└── frontend
+    ├── index.html
+    ├── jsconfig.json
+    ├── node_modules
+    ├── package-lock.json
+    ├── package.json
+    ├── public
+    ├── src
+    └── vite.config.js
 ```
 
 ---
@@ -220,22 +233,9 @@ By completing this project, I'll gain experience with:
 
 ## Possible Future Improvements
 
-- Spectator mode
-- Score tracking
-- User authentication
-- Persistent match history
-- Matchmaking queue
-- Timed rounds
-- Chat system
-- Emojis and reactions
-- Animations
-- Mobile-friendly UI
-- Docker deployment
-- HTTPS support
-- Horizontal scaling with Redis Pub/Sub
-- Automated tests
-- Rate limiting
-- Reconnection support
+- Better game functionality
+- Chat implementation
+- better UI
 
 ---
 
